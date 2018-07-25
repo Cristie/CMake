@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 include(RunCMake)
 
 run_cmake_command(NoArgs ${CMAKE_COMMAND})
+run_cmake_command(Wizard ${CMAKE_COMMAND} -i)
 run_cmake_command(C-no-arg ${CMAKE_COMMAND} -C)
 run_cmake_command(C-no-file ${CMAKE_COMMAND} -C nosuchcachefile.txt)
 run_cmake_command(cache-no-file ${CMAKE_COMMAND} nosuchsubdir/CMakeCache.txt)
@@ -59,6 +60,29 @@ function(run_BuildDir)
     ${CMAKE_COMMAND} --build BuildDir-build --target CustomTarget)
   run_cmake_command(BuildDir--build-multiple-targets ${CMAKE_COMMAND} -E chdir ..
     ${CMAKE_COMMAND} --build BuildDir-build --target CustomTarget2 --target CustomTarget3)
+  run_cmake_command(BuildDir--build-jobs-bad-number ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build -j 12ab)
+  run_cmake_command(BuildDir--build-jobs-good-number ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build -j 2)
+  run_cmake_command(BuildDir--build-jobs-good-number-trailing--target ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build -j 2 --target CustomTarget)
+  run_cmake_command(BuildDir--build--parallel-bad-number ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build --parallel 12ab)
+  run_cmake_command(BuildDir--build--parallel-good-number ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build --parallel 2)
+  run_cmake_command(BuildDir--build--parallel-good-number-trailing--target ${CMAKE_COMMAND} -E chdir ..
+    ${CMAKE_COMMAND} --build BuildDir-build --parallel 2 --target CustomTarget)
+  # No default jobs for Xcode and FreeBSD build command
+  if(NOT RunCMake_GENERATOR MATCHES "Xcode" AND NOT CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+    run_cmake_command(BuildDir--build-jobs-no-number ${CMAKE_COMMAND} -E chdir ..
+      ${CMAKE_COMMAND} --build BuildDir-build -j)
+    run_cmake_command(BuildDir--build-jobs-no-number-trailing--target ${CMAKE_COMMAND} -E chdir ..
+      ${CMAKE_COMMAND} --build BuildDir-build -j --target CustomTarget)
+    run_cmake_command(BuildDir--build--parallel-no-number ${CMAKE_COMMAND} -E chdir ..
+      ${CMAKE_COMMAND} --build BuildDir-build --parallel)
+    run_cmake_command(BuildDir--build--parallel-no-number-trailing--target ${CMAKE_COMMAND} -E chdir ..
+      ${CMAKE_COMMAND} --build BuildDir-build --parallel --target CustomTarget)
+  endif()
 endfunction()
 run_BuildDir()
 
@@ -76,13 +100,6 @@ if(RunCMake_GENERATOR STREQUAL "Ninja")
 
   unset(RunCMake_TEST_BINARY_DIR)
   unset(RunCMake_TEST_NO_CLEAN)
-endif()
-
-if(RunCMake_GENERATOR MATCHES "^Visual Studio 8 2005")
-  set(RunCMake_WARN_VS8 1)
-  run_cmake(DeprecateVS8-WARN-ON)
-  unset(RunCMake_WARN_VS8)
-  run_cmake(DeprecateVS8-WARN-OFF)
 endif()
 
 if(UNIX)
@@ -292,6 +309,10 @@ unset(RunCMake_TEST_OPTIONS)
 
 set(RunCMake_TEST_OPTIONS --trace-expand)
 run_cmake(trace-expand)
+unset(RunCMake_TEST_OPTIONS)
+
+set(RunCMake_TEST_OPTIONS --trace-expand --warn-uninitialized)
+run_cmake(trace-expand-warn-uninitialized)
 unset(RunCMake_TEST_OPTIONS)
 
 set(RunCMake_TEST_OPTIONS --trace-source=trace-only-this-file.cmake)

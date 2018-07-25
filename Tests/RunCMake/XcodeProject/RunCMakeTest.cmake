@@ -1,9 +1,16 @@
 include(RunCMake)
 
+if(XCODE_VERSION VERSION_GREATER_EQUAL 9)
+  set(IOS_DEPLOYMENT_TARGET "-DCMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET=10")
+endif()
+
+run_cmake(ExplicitCMakeLists)
+
 run_cmake(XcodeFileType)
 run_cmake(XcodeAttributeLocation)
 run_cmake(XcodeAttributeGenex)
 run_cmake(XcodeAttributeGenexError)
+run_cmake(XcodeGenerateTopLevelProjectOnly)
 run_cmake(XcodeObjectNeedsEscape)
 run_cmake(XcodeObjectNeedsQuote)
 run_cmake(XcodeOptimizationFlags)
@@ -14,13 +21,18 @@ if (NOT XCODE_VERSION VERSION_LESS 6)
 endif()
 
 run_cmake(PerConfigPerSourceFlags)
+run_cmake(PerConfigPerSourceOptions)
+run_cmake(PerConfigPerSourceDefinitions)
+run_cmake(PerConfigPerSourceIncludeDirs)
 
 # Use a single build tree for a few tests without cleaning.
 
 if(NOT XCODE_VERSION VERSION_LESS 5)
   set(RunCMake_TEST_BINARY_DIR ${RunCMake_BINARY_DIR}/XcodeInstallIOS-build)
   set(RunCMake_TEST_NO_CLEAN 1)
-  set(RunCMake_TEST_OPTIONS "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_BINARY_DIR}/ios_install")
+  set(RunCMake_TEST_OPTIONS
+    "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_BINARY_DIR}/ios_install"
+    "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -53,7 +65,8 @@ if(NOT XCODE_VERSION VERSION_LESS 5)
   set(RunCMake_TEST_NO_CLEAN 1)
   set(RunCMake_TEST_OPTIONS
     "-DTEST_IOS=ON"
-    "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_TEST_BINARY_DIR}/_install")
+    "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_TEST_BINARY_DIR}/_install"
+    "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -117,7 +130,8 @@ if(NOT XCODE_VERSION VERSION_LESS 6)
   set(RunCMake_TEST_NO_CLEAN 1)
   set(RunCMake_TEST_OPTIONS
     "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_TEST_BINARY_DIR}/_install"
-    "-DCMAKE_IOS_INSTALL_COMBINED=YES")
+    "-DCMAKE_IOS_INSTALL_COMBINED=YES"
+    "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -135,7 +149,8 @@ if(NOT XCODE_VERSION VERSION_LESS 6)
   set(RunCMake_TEST_NO_CLEAN 1)
   set(RunCMake_TEST_OPTIONS
     "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_TEST_BINARY_DIR}/_install"
-    "-DCMAKE_IOS_INSTALL_COMBINED=YES")
+    "-DCMAKE_IOS_INSTALL_COMBINED=YES"
+    "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -153,7 +168,8 @@ if(NOT XCODE_VERSION VERSION_LESS 6)
   set(RunCMake_TEST_NO_CLEAN 1)
   set(RunCMake_TEST_OPTIONS
     "-DCMAKE_INSTALL_PREFIX:PATH=${RunCMake_TEST_BINARY_DIR}/_install"
-    "-DCMAKE_IOS_INSTALL_COMBINED=YES")
+    "-DCMAKE_IOS_INSTALL_COMBINED=YES"
+    "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -170,6 +186,7 @@ endif()
 if(NOT XCODE_VERSION VERSION_LESS 5)
   set(RunCMake_TEST_BINARY_DIR ${RunCMake_BINARY_DIR}/XcodeMultiplatform-build)
   set(RunCMake_TEST_NO_CLEAN 1)
+  set(RunCMake_TEST_OPTIONS "${IOS_DEPLOYMENT_TARGET}")
 
   file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
   file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
@@ -203,3 +220,35 @@ endfunction()
 if(NOT XCODE_VERSION VERSION_LESS 7)
   XcodeSchemaGeneration()
 endif()
+
+if(XCODE_VERSION VERSION_GREATER_EQUAL 8)
+  function(deploymeny_target_test SDK)
+    set(RunCMake_TEST_BINARY_DIR ${RunCMake_BINARY_DIR}/DeploymentTarget-${SDK}-build)
+    set(RunCMake_TEST_NO_CLEAN 1)
+    set(RunCMake_TEST_OPTIONS "-DSDK=${SDK}")
+
+    file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
+    file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
+
+    run_cmake(DeploymentTarget)
+    run_cmake_command(DeploymentTarget-${SDK} ${CMAKE_COMMAND} --build .)
+  endfunction()
+
+  foreach(SDK macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator)
+    deploymeny_target_test(${SDK})
+  endforeach()
+endif()
+
+function(XcodeDependOnZeroCheck)
+  set(RunCMake_TEST_BINARY_DIR ${RunCMake_BINARY_DIR}/XcodeDependOnZeroCheck-build)
+  set(RunCMake_TEST_NO_CLEAN 1)
+
+  file(REMOVE_RECURSE "${RunCMake_TEST_BINARY_DIR}")
+  file(MAKE_DIRECTORY "${RunCMake_TEST_BINARY_DIR}")
+
+  run_cmake(XcodeDependOnZeroCheck)
+  run_cmake_command(XcodeDependOnZeroCheck-build ${CMAKE_COMMAND} --build . --target parentdirlib)
+  run_cmake_command(XcodeDependOnZeroCheck-build ${CMAKE_COMMAND} --build . --target subdirlib)
+endfunction()
+
+XcodeDependOnZeroCheck()

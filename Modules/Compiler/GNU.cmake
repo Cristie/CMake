@@ -24,6 +24,9 @@ macro(__compiler_gnu lang)
   set(CMAKE_SHARED_LIBRARY_CREATE_${lang}_FLAGS "-shared")
   set(CMAKE_${lang}_COMPILE_OPTIONS_SYSROOT "--sysroot=")
 
+  set(CMAKE_${lang}_LINKER_WRAPPER_FLAG "-Wl,")
+  set(CMAKE_${lang}_LINKER_WRAPPER_FLAG_SEP ",")
+
   # Older versions of gcc (< 4.5) contain a bug causing them to report a missing
   # header file as a warning if depfiles are enabled, causing check_header_file
   # tests to always succeed.  Work around this by disabling dependency tracking
@@ -75,15 +78,17 @@ macro(__compiler_gnu lang)
     #
     # [1]: https://gcc.gnu.org/onlinedocs/gcc-4.9.4/gcc/Optimize-Options.html
     set(CMAKE_${lang}_ARCHIVE_CREATE_IPO
-      "${CMAKE_${lang}_COMPILER_AR} cr <TARGET> <LINK_FLAGS> <OBJECTS>"
+      "\"${CMAKE_${lang}_COMPILER_AR}\" cr <TARGET> <LINK_FLAGS> <OBJECTS>"
     )
 
     set(CMAKE_${lang}_ARCHIVE_APPEND_IPO
-      "${CMAKE_${lang}_COMPILER_AR} r <TARGET> <LINK_FLAGS> <OBJECTS>"
+      "\"${CMAKE_${lang}_COMPILER_AR}\" r <TARGET> <LINK_FLAGS> <OBJECTS>"
     )
 
     set(CMAKE_${lang}_ARCHIVE_FINISH_IPO
-      "${CMAKE_${lang}_COMPILER_RANLIB} <TARGET>"
+      "\"${CMAKE_${lang}_COMPILER_RANLIB}\" <TARGET>"
     )
   endif()
+
+  set(CMAKE_${lang}_COMPILER_PREDEFINES_COMMAND "${CMAKE_${lang}_COMPILER}" "-dM" "-E" "-c" "${CMAKE_ROOT}/Modules/CMakeCXXCompilerABI.cpp")
 endmacro()

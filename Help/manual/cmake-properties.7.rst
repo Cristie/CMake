@@ -40,6 +40,7 @@ Properties of Global Scope
    /prop_gbl/JOB_POOLS
    /prop_gbl/PREDEFINED_TARGETS_FOLDER
    /prop_gbl/ECLIPSE_EXTRA_NATURES
+   /prop_gbl/ECLIPSE_EXTRA_CPROJECT_CONTENTS
    /prop_gbl/REPORT_UNDEFINED_PROPERTIES
    /prop_gbl/RULE_LAUNCH_COMPILE
    /prop_gbl/RULE_LAUNCH_CUSTOM
@@ -76,6 +77,7 @@ Properties on Directories
    /prop_dir/INTERPROCEDURAL_OPTIMIZATION
    /prop_dir/LABELS
    /prop_dir/LINK_DIRECTORIES
+   /prop_dir/LINK_OPTIONS
    /prop_dir/LISTFILE_STACK
    /prop_dir/MACROS
    /prop_dir/PARENT_DIRECTORY
@@ -84,6 +86,7 @@ Properties on Directories
    /prop_dir/RULE_LAUNCH_LINK
    /prop_dir/SOURCE_DIR
    /prop_dir/SUBDIRECTORIES
+   /prop_dir/TESTS
    /prop_dir/TEST_INCLUDE_FILES
    /prop_dir/VARIABLES
    /prop_dir/VS_GLOBAL_SECTION_POST_section
@@ -121,6 +124,7 @@ Properties on Targets
    /prop_tgt/ARCHIVE_OUTPUT_NAME_CONFIG
    /prop_tgt/ARCHIVE_OUTPUT_NAME
    /prop_tgt/AUTOGEN_BUILD_DIR
+   /prop_tgt/AUTOGEN_PARALLEL
    /prop_tgt/AUTOGEN_TARGET_DEPENDS
    /prop_tgt/AUTOMOC_COMPILER_PREDEFINES
    /prop_tgt/AUTOMOC_DEPEND_FILTERS
@@ -141,6 +145,7 @@ Properties on Targets
    /prop_tgt/C_EXTENSIONS
    /prop_tgt/C_STANDARD
    /prop_tgt/C_STANDARD_REQUIRED
+   /prop_tgt/COMMON_LANGUAGE_RUNTIME
    /prop_tgt/COMPATIBLE_INTERFACE_BOOL
    /prop_tgt/COMPATIBLE_INTERFACE_NUMBER_MAX
    /prop_tgt/COMPATIBLE_INTERFACE_NUMBER_MIN
@@ -168,12 +173,15 @@ Properties on Targets
    /prop_tgt/DEBUG_POSTFIX
    /prop_tgt/DEFINE_SYMBOL
    /prop_tgt/DEPLOYMENT_REMOTE_DIRECTORY
+   /prop_tgt/DEPLOYMENT_ADDITIONAL_FILES
+   /prop_tgt/DOTNET_TARGET_FRAMEWORK_VERSION
    /prop_tgt/EchoString
    /prop_tgt/ENABLE_EXPORTS
    /prop_tgt/EXCLUDE_FROM_ALL
    /prop_tgt/EXCLUDE_FROM_DEFAULT_BUILD_CONFIG
    /prop_tgt/EXCLUDE_FROM_DEFAULT_BUILD
    /prop_tgt/EXPORT_NAME
+   /prop_tgt/EXPORT_PROPERTIES
    /prop_tgt/FOLDER
    /prop_tgt/Fortran_FORMAT
    /prop_tgt/Fortran_MODULE_DIRECTORY
@@ -183,11 +191,14 @@ Properties on Targets
    /prop_tgt/GNUtoMS
    /prop_tgt/HAS_CXX
    /prop_tgt/IMPLICIT_DEPENDS_INCLUDE_TRANSFORM
+   /prop_tgt/IMPORTED_COMMON_LANGUAGE_RUNTIME
    /prop_tgt/IMPORTED_CONFIGURATIONS
+   /prop_tgt/IMPORTED_GLOBAL
    /prop_tgt/IMPORTED_IMPLIB_CONFIG
    /prop_tgt/IMPORTED_IMPLIB
    /prop_tgt/IMPORTED_LIBNAME_CONFIG
    /prop_tgt/IMPORTED_LIBNAME
+   /prop_tgt/IMPORTED_LINK_DEPENDENT_LIBRARIES_CONFIG
    /prop_tgt/IMPORTED_LINK_DEPENDENT_LIBRARIES_CONFIG
    /prop_tgt/IMPORTED_LINK_DEPENDENT_LIBRARIES
    /prop_tgt/IMPORTED_LINK_INTERFACE_LANGUAGES_CONFIG
@@ -216,7 +227,9 @@ Properties on Targets
    /prop_tgt/INTERFACE_COMPILE_FEATURES
    /prop_tgt/INTERFACE_COMPILE_OPTIONS
    /prop_tgt/INTERFACE_INCLUDE_DIRECTORIES
+   /prop_tgt/INTERFACE_LINK_DEPENDS
    /prop_tgt/INTERFACE_LINK_LIBRARIES
+   /prop_tgt/INTERFACE_LINK_OPTIONS
    /prop_tgt/INTERFACE_POSITION_INDEPENDENT_CODE
    /prop_tgt/INTERFACE_SOURCES
    /prop_tgt/INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
@@ -246,6 +259,7 @@ Properties on Targets
    /prop_tgt/LINK_INTERFACE_MULTIPLICITY_CONFIG
    /prop_tgt/LINK_INTERFACE_MULTIPLICITY
    /prop_tgt/LINK_LIBRARIES
+   /prop_tgt/LINK_OPTIONS
    /prop_tgt/LINK_SEARCH_END_STATIC
    /prop_tgt/LINK_SEARCH_START_STATIC
    /prop_tgt/LINK_WHAT_YOU_USE
@@ -292,6 +306,9 @@ Properties on Targets
    /prop_tgt/VERSION
    /prop_tgt/VISIBILITY_INLINES_HIDDEN
    /prop_tgt/VS_CONFIGURATION_TYPE
+   /prop_tgt/VS_DEBUGGER_COMMAND
+   /prop_tgt/VS_DEBUGGER_COMMAND_ARGUMENTS
+   /prop_tgt/VS_DEBUGGER_ENVIRONMENT
    /prop_tgt/VS_DEBUGGER_WORKING_DIRECTORY
    /prop_tgt/VS_DESKTOP_EXTENSIONS_VERSION
    /prop_tgt/VS_DOTNET_REFERENCE_refname
@@ -345,6 +362,7 @@ Properties on Tests
    /prop_test/LABELS
    /prop_test/MEASUREMENT
    /prop_test/PASS_REGULAR_EXPRESSION
+   /prop_test/PROCESSOR_AFFINITY
    /prop_test/PROCESSORS
    /prop_test/REQUIRED_FILES
    /prop_test/RESOURCE_LOCK
@@ -368,10 +386,12 @@ Properties on Source Files
    /prop_sf/AUTORCC_OPTIONS
    /prop_sf/COMPILE_DEFINITIONS
    /prop_sf/COMPILE_FLAGS
+   /prop_sf/COMPILE_OPTIONS
    /prop_sf/EXTERNAL_OBJECT
    /prop_sf/Fortran_FORMAT
    /prop_sf/GENERATED
    /prop_sf/HEADER_FILE_ONLY
+   /prop_sf/INCLUDE_DIRECTORIES
    /prop_sf/KEEP_EXTENSION
    /prop_sf/LABELS
    /prop_sf/LANGUAGE
@@ -390,9 +410,12 @@ Properties on Source Files
    /prop_sf/VS_DEPLOYMENT_LOCATION
    /prop_sf/VS_INCLUDE_IN_VSIX
    /prop_sf/VS_RESOURCE_GENERATOR
+   /prop_sf/VS_SHADER_DISABLE_OPTIMIZATIONS
+   /prop_sf/VS_SHADER_ENABLE_DEBUG
    /prop_sf/VS_SHADER_ENTRYPOINT
    /prop_sf/VS_SHADER_FLAGS
    /prop_sf/VS_SHADER_MODEL
+   /prop_sf/VS_SHADER_OBJECT_FILE_NAME
    /prop_sf/VS_SHADER_OUTPUT_HEADER_FILE
    /prop_sf/VS_SHADER_TYPE
    /prop_sf/VS_SHADER_VARIABLE_NAME

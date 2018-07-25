@@ -40,23 +40,27 @@ public:
    * Utilized by the generator factory to determine if this generator
    * supports toolsets.
    */
-  static bool SupportsToolset() { return false; }
+  static bool SupportsToolset() { return true; }
 
   /**
    * Utilized by the generator factory to determine if this generator
    * supports platforms.
    */
-  static bool SupportsPlatform() { return false; }
+  static bool SupportsPlatform() { return true; }
+
+  // Toolset / Platform Support
+  virtual bool SetGeneratorToolset(std::string const& ts, cmMakefile* mf);
+  virtual bool SetGeneratorPlatform(std::string const& p, cmMakefile* mf);
 
   /**
-  * Try to determine system information such as shared library
-  * extension, pthreads, byte order etc.
-  */
+   * Try to determine system information such as shared library
+   * extension, pthreads, byte order etc.
+   */
   virtual void EnableLanguage(std::vector<std::string> const& languages,
                               cmMakefile*, bool optional);
   /*
-  * Determine what program to use for building the project.
-  */
+   * Determine what program to use for building the project.
+   */
   bool FindMakeProgram(cmMakefile* mf) override;
 
   cmGeneratedFileStream* GetBuildFileStream()
@@ -89,15 +93,11 @@ protected:
     std::vector<std::string>& makeCommand, const std::string& makeProgram,
     const std::string& projectName, const std::string& projectDir,
     const std::string& targetName, const std::string& config, bool fast,
-    bool verbose,
+    int jobs, bool verbose,
     std::vector<std::string> const& makeOptions = std::vector<std::string>());
 
 private:
-  std::string const& GetGhsBuildCommand();
-  std::string FindGhsBuildCommand();
-  std::string GetCompRoot();
-  std::vector<std::string> GetCompRootHardPaths();
-  std::vector<std::string> GetCompRootRegistry();
+  void GetToolset(cmMakefile* mf, std::string& tsd, std::string& ts);
   void OpenBuildFileStream();
 
   void WriteMacros();
@@ -112,9 +112,8 @@ private:
   static void AddFilesUpToPathAppendNextFile(
     std::map<std::string, cmGeneratedFileStream*>* targetFolderBuildStreams,
     std::string const& pathUpTo,
-    std::vector<cmsys::String>::const_iterator splitPathI,
-    std::vector<cmsys::String>::const_iterator end,
-    GhsMultiGpj::Types projType);
+    std::vector<std::string>::const_iterator splitPathI,
+    std::vector<std::string>::const_iterator end, GhsMultiGpj::Types projType);
   static std::string GetFileNameFromPath(std::string const& path);
   void UpdateBuildFiles(const std::vector<cmGeneratorTarget*>& tgts);
   bool IsTgtForBuild(const cmGeneratorTarget* tgt);
@@ -125,9 +124,8 @@ private:
   std::vector<std::string> LibDirs;
 
   bool OSDirRelative;
-  bool GhsBuildCommandInitialized;
-  std::string GhsBuildCommand;
-  static const char* DEFAULT_MAKE_PROGRAM;
+  static const char* DEFAULT_BUILD_PROGRAM;
+  static const char* DEFAULT_TOOLSET_ROOT;
 };
 
 #endif

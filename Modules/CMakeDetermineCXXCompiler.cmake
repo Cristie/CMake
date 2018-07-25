@@ -105,6 +105,7 @@ if(NOT CMAKE_CXX_COMPILER_ID_RUN)
 
   include(${CMAKE_ROOT}/Modules/CMakeDetermineCompilerId.cmake)
   CMAKE_DETERMINE_COMPILER_ID(CXX CXXFLAGS CMakeCXXCompilerId.cpp)
+  CMAKE_DIAGNOSE_UNSUPPORTED_CLANG(CXX CXX)
 
   # Set old compiler and platform id variables.
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -163,8 +164,8 @@ if (CMAKE_CROSSCOMPILING  AND NOT  _CMAKE_TOOLCHAIN_PREFIX)
 
 endif ()
 
-include(CMakeFindBinUtils)
 set(_CMAKE_PROCESSING_LANGUAGE "CXX")
+include(CMakeFindBinUtils)
 include(Compiler/${CMAKE_CXX_COMPILER_ID}-FindBinUtils OPTIONAL)
 unset(_CMAKE_PROCESSING_LANGUAGE)
 
@@ -180,9 +181,9 @@ if(MSVC_CXX_ARCHITECTURE_ID)
     "set(MSVC_CXX_ARCHITECTURE_ID ${MSVC_CXX_ARCHITECTURE_ID})")
 endif()
 
-if(CMAKE_CXX_XCODE_CURRENT_ARCH)
-  set(SET_CMAKE_XCODE_CURRENT_ARCH
-    "set(CMAKE_XCODE_CURRENT_ARCH ${CMAKE_CXX_XCODE_CURRENT_ARCH})")
+if(CMAKE_CXX_XCODE_ARCHS)
+  set(SET_CMAKE_XCODE_ARCHS
+    "set(CMAKE_XCODE_ARCHS \"${CMAKE_CXX_XCODE_ARCHS}\")")
 endif()
 
 # configure all variables set in this file

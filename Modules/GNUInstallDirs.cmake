@@ -123,6 +123,9 @@
 #   allow users who create additional path variables to also compute
 #   absolute paths where necessary, using the same logic.
 
+cmake_policy(PUSH)
+cmake_policy(SET CMP0054 NEW) # if() quoted variables not dereferenced
+
 # Convert a cache variable to PATH type
 
 macro(_GNUInstallDirs_cache_convert_to_path var description)
@@ -202,7 +205,7 @@ if(NOT DEFINED CMAKE_INSTALL_LIBDIR OR (_libdir_set
   #  - we are on Linux system but NOT cross-compiling
   #  - we are NOT on debian
   #  - we are on a 64 bits system
-  # reason is: amd64 ABI: http://www.x86-64.org/documentation/abi.pdf
+  # reason is: amd64 ABI: https://github.com/hjl-tools/x86-psABI/wiki/X86-psABI
   # For Debian with multiarch, use 'lib/${CMAKE_LIBRARY_ARCHITECTURE}' if
   # CMAKE_LIBRARY_ARCHITECTURE is set (which contains e.g. "i386-linux-gnu"
   # and CMAKE_INSTALL_PREFIX is "/usr"
@@ -371,3 +374,5 @@ foreach(dir
     )
   GNUInstallDirs_get_absolute_install_dir(CMAKE_INSTALL_FULL_${dir} CMAKE_INSTALL_${dir})
 endforeach()
+
+cmake_policy(POP)

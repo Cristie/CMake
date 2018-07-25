@@ -12,8 +12,9 @@
 #include "cmSystemTools.h"
 #include "cmake.h"
 
-cmSourceFile::cmSourceFile(cmMakefile* mf, const std::string& name)
-  : Location(mf, name)
+cmSourceFile::cmSourceFile(cmMakefile* mf, const std::string& name,
+                           cmSourceFileLocationKind kind)
+  : Location(mf, name, kind)
 {
   this->CustomCommand = nullptr;
   this->FindFullPathFailed = false;
@@ -110,7 +111,7 @@ std::string const& cmSourceFile::GetFullPath() const
 
 bool cmSourceFile::FindFullPath(std::string* error)
 {
-  // If thie method has already failed once do not try again.
+  // If this method has already failed once do not try again.
   if (this->FindFullPathFailed) {
     return false;
   }
@@ -191,7 +192,7 @@ bool cmSourceFile::TryFullPath(const std::string& path, const std::string& ext)
     tryPath += ".";
     tryPath += ext;
   }
-  if (cmSystemTools::FileExists(tryPath.c_str())) {
+  if (cmSystemTools::FileExists(tryPath)) {
     this->FullPath = tryPath;
     return true;
   }
@@ -293,6 +294,15 @@ const char* cmSourceFile::GetProperty(const std::string& prop) const
   }
 
   return retVal;
+}
+
+const char* cmSourceFile::GetSafeProperty(const std::string& prop) const
+{
+  const char* ret = this->GetProperty(prop);
+  if (!ret) {
+    return "";
+  }
+  return ret;
 }
 
 bool cmSourceFile::GetPropertyAsBool(const std::string& prop) const

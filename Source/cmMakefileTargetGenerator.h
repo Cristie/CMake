@@ -52,6 +52,8 @@ public:
   cmGeneratorTarget* GetGeneratorTarget() { return this->GeneratorTarget; }
 
 protected:
+  void GetTargetLinkFlags(std::string& flags, const std::string& linkLanguage);
+
   // create the file and directory etc
   void CreateRuleFile();
 
@@ -62,9 +64,6 @@ protected:
   // write some common code at the top of build.make
   void WriteCommonCodeRules();
   void WriteTargetLanguageFlags();
-
-  // write the provide require rules for this target
-  void WriteTargetRequiresRules();
 
   // write the clean rules for this target
   void WriteTargetCleanRules();
@@ -129,7 +128,8 @@ protected:
   void AppendObjectDepends(std::vector<std::string>& depends);
 
   // Append link rule dependencies (objects, etc.).
-  void AppendLinkDepends(std::vector<std::string>& depends);
+  void AppendLinkDepends(std::vector<std::string>& depends,
+                         const std::string& linkLanguage);
 
   // Lookup the link rule for this target.
   std::string GetLinkRule(const std::string& linkRuleVar);

@@ -18,6 +18,8 @@ string(APPEND CMAKE_CXX_FLAGS_MINSIZEREL_INIT " -xO2 -xspace -DNDEBUG")
 string(APPEND CMAKE_CXX_FLAGS_RELEASE_INIT " -xO3 -DNDEBUG")
 string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT " -g -xO2 -DNDEBUG")
 
+set(CMAKE_DEPFILE_FLAGS_CXX "-xMD -xMF <DEPFILE>")
+
 # Initialize C link type selection flags.  These flags are used when
 # building a shared library, shared module, or executable that links
 # to other libraries to select whether to use the static or shared
@@ -26,6 +28,9 @@ foreach(type SHARED_LIBRARY SHARED_MODULE EXE)
   set(CMAKE_${type}_LINK_STATIC_CXX_FLAGS "-Bstatic")
   set(CMAKE_${type}_LINK_DYNAMIC_CXX_FLAGS "-Bdynamic")
 endforeach()
+
+set(CMAKE_CXX_LINKER_WRAPPER_FLAG "-Qoption" "ld" " ")
+set(CMAKE_CXX_LINKER_WRAPPER_FLAG_SEP ",")
 
 set(CMAKE_CXX_CREATE_PREPROCESSED_SOURCE "<CMAKE_CXX_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -E <SOURCE> > <PREPROCESSED_SOURCE>")
 set(CMAKE_CXX_CREATE_ASSEMBLY_SOURCE "<CMAKE_CXX_COMPILER> <INCLUDES> <FLAGS> -S <SOURCE> -o <ASSEMBLY_SOURCE>")

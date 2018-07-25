@@ -11,7 +11,8 @@ set(__COMPILER_CLANG 1)
 include(Compiler/CMakeCommonCompilerMacros)
 
 if("x${CMAKE_C_SIMULATE_ID}" STREQUAL "xMSVC"
-    OR "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+    OR "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC"
+    OR "x${CMAKE_Fortran_SIMULATE_ID}" STREQUAL "xMSVC")
   macro(__compiler_clang lang)
   endmacro()
 else()
@@ -29,6 +30,8 @@ else()
       set(CMAKE_${lang}_COMPILE_OPTIONS_TARGET "--target=")
       set(CMAKE_${lang}_COMPILE_OPTIONS_EXTERNAL_TOOLCHAIN "--gcc-toolchain=")
     endif()
+    set(CMAKE_${lang}_LINKER_WRAPPER_FLAG "-Xlinker" " ")
+    set(CMAKE_${lang}_LINKER_WRAPPER_FLAG_SEP)
 
     set(_CMAKE_${lang}_IPO_SUPPORTED_BY_CMAKE YES)
     set(_CMAKE_${lang}_IPO_MAY_BE_SUPPORTED_BY_COMPILER YES)
@@ -69,15 +72,15 @@ else()
     endif()
 
     set(CMAKE_${lang}_ARCHIVE_CREATE_IPO
-      "${__ar} cr <TARGET> <LINK_FLAGS> <OBJECTS>"
+      "\"${__ar}\" cr <TARGET> <LINK_FLAGS> <OBJECTS>"
     )
 
     set(CMAKE_${lang}_ARCHIVE_APPEND_IPO
-      "${__ar} r <TARGET> <LINK_FLAGS> <OBJECTS>"
+      "\"${__ar}\" r <TARGET> <LINK_FLAGS> <OBJECTS>"
     )
 
     set(CMAKE_${lang}_ARCHIVE_FINISH_IPO
-      "${__ranlib} <TARGET>"
+      "\"${__ranlib}\" <TARGET>"
     )
   endmacro()
 endif()

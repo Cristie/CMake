@@ -25,7 +25,9 @@ struct cmGeneratorExpressionContext;
   SELECT(F, EvaluatingCompileOptions, COMPILE_OPTIONS)                        \
   SELECT(F, EvaluatingAutoUicOptions, AUTOUIC_OPTIONS)                        \
   SELECT(F, EvaluatingSources, SOURCES)                                       \
-  SELECT(F, EvaluatingCompileFeatures, COMPILE_FEATURES)
+  SELECT(F, EvaluatingCompileFeatures, COMPILE_FEATURES)                      \
+  SELECT(F, EvaluatingLinkOptions, LINK_OPTIONS)                              \
+  SELECT(F, EvaluatingLinkDepends, LINK_DEPENDS)
 
 #define CM_FOR_EACH_TRANSITIVE_PROPERTY(F)                                    \
   CM_FOR_EACH_TRANSITIVE_PROPERTY_IMPL(F, CM_SELECT_BOTH)
@@ -61,6 +63,7 @@ struct cmGeneratorExpressionDAGChecker
   void ReportError(cmGeneratorExpressionContext* context,
                    const std::string& expr);
 
+  bool EvaluatingGenexExpression();
   bool EvaluatingLinkLibraries(const char* tgt = nullptr);
 
 #define DECLARE_TRANSITIVE_PROPERTY_METHOD(METHOD) bool METHOD() const;

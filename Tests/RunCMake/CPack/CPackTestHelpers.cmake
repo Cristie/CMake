@@ -1,10 +1,14 @@
 cmake_policy(SET CMP0057 NEW)
 
-function(run_cpack_test_common_ TEST_NAME types build SUBTEST_SUFFIX source PACKAGING_TYPE)
+function(run_cpack_test_common_ TEST_NAME types build SUBTEST_SUFFIX source PACKAGING_TYPE package_target)
   if(TEST_TYPE IN_LIST types)
     set(RunCMake_TEST_NO_CLEAN TRUE)
-    set(RunCMake_TEST_BINARY_DIR "${RunCMake_BINARY_DIR}/${TEST_NAME}-build")
-    set(full_test_name_ "${TEST_NAME}")
+    if(package_target)
+      set(full_test_name_ "${TEST_NAME}-package-target")
+    else()
+      set(full_test_name_ "${TEST_NAME}")
+    endif()
+    set(RunCMake_TEST_BINARY_DIR "${RunCMake_BINARY_DIR}/${full_test_name_}-build")
 
     if(SUBTEST_SUFFIX)
       set(RunCMake_TEST_BINARY_DIR "${RunCMake_TEST_BINARY_DIR}-${SUBTEST_SUFFIX}-subtest")
@@ -35,10 +39,27 @@ function(run_cpack_test_common_ TEST_NAME types build SUBTEST_SUFFIX source PACK
       "-DRunCMake_TEST_FILE_PREFIX=${TEST_NAME}"
       "-DRunCMake_SUBTEST_SUFFIX=${SUBTEST_SUFFIX}"
       "-DPACKAGING_TYPE=${PACKAGING_TYPE}")
+
+    foreach(o out err)
+      if(SUBTEST_SUFFIX AND EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/configure-${PACKAGING_TYPE}-${SUBTEST_SUFFIX}-std${o}.txt)
+        set(RunCMake-std${o}-file "tests/${TEST_NAME}/configure-${PACKAGING_TYPE}-${SUBTEST_SUFFIX}-std${o}.txt")
+      elseif(SUBTEST_SUFFIX AND EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/configure-${SUBTEST_SUFFIX}-std${o}.txt)
+        set(RunCMake-std${o}-file "tests/${TEST_NAME}/configure-${SUBTEST_SUFFIX}-std${o}.txt")
+      elseif(EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/configure-${PACKAGING_TYPE}-std${o}.txt)
+        set(RunCMake-std${o}-file "tests/${TEST_NAME}/configure-${PACKAGING_TYPE}-std${o}.txt")
+      elseif(EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/configure-std${o}.txt)
+        set(RunCMake-std${o}-file "tests/${TEST_NAME}/configure-std${o}.txt")
+      else()
+        unset(RunCMake-std${o}-file)
+      endif()
+    endforeach()
+
     run_cmake(${full_test_name_})
 
     # execute optional build step
     if(build)
+      unset(RunCMake-stdout-file)
+      unset(RunCMake-stderr-file)
       run_cmake_command(${full_test_name_}-Build "${CMAKE_COMMAND}" --build "${RunCMake_TEST_BINARY_DIR}")
     endif()
 
@@ -50,9 +71,15 @@ function(run_cpack_test_common_ TEST_NAME types build SUBTEST_SUFFIX source PACK
       unset(pack_params_)
     endif()
 
+    if(package_target)
+      set(cpack_command_ ${CMAKE_COMMAND} --build "${RunCMake_TEST_BINARY_DIR}" --target package)
+    else()
+      set(cpack_command_ ${CMAKE_CPACK_COMMAND} ${pack_params_})
+    endif()
+
     # execute cpack
     execute_process(
-      COMMAND ${CMAKE_CPACK_COMMAND} ${pack_params_}
+      COMMAND ${cpack_command_}
       WORKING_DIRECTORY "${RunCMake_TEST_BINARY_DIR}"
       RESULT_VARIABLE "result_"
       OUTPUT_FILE "${RunCMake_TEST_BINARY_DIR}/test_output.txt"
@@ -68,8 +95,12 @@ function(run_cpack_test_common_ TEST_NAME types build SUBTEST_SUFFIX source PACK
         set(RunCMake-std${o}-file "tests/${TEST_NAME}/${TEST_TYPE}-${SUBTEST_SUFFIX}-std${o}.txt")
       elseif(EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/${TEST_TYPE}-std${o}.txt)
         set(RunCMake-std${o}-file "tests/${TEST_NAME}/${TEST_TYPE}-std${o}.txt")
+      elseif(SUBTEST_SUFFIX AND EXISTS ${RunCMake_SOURCE_DIR}/tests/${TEST_NAME}/${SUBTEST_SUFFIX}-std${o}.txt)
+        set(RunCMake-std${o}-file "tests/${TEST_NAME}/${SUBTEST_SUFFIX}-std${o}.txt")
       elseif(EXISTS ${RunCMake_SOURCE_DIR}/${TEST_TYPE}/default_expected_std${o}.txt)
         set(RunCMake-std${o}-file "${TEST_TYPE}/default_expected_std${o}.txt")
+      else()
+        unset(RunCMake-std${o}-file)
       endif()
     endforeach()
 
@@ -92,18 +123,24 @@ endfunction()
 
 function(run_cpack_test TEST_NAME types build PACKAGING_TYPES)
   foreach(packaging_type_ IN LISTS PACKAGING_TYPES)
-    run_cpack_test_common_("${TEST_NAME}" "${types}" "${build}" "" false "${packaging_type_}")
+    run_cpack_test_common_("${TEST_NAME}" "${types}" "${build}" "" false "${packaging_type_}" false)
+  endforeach()
+endfunction()
+
+function(run_cpack_test_package_target TEST_NAME types build PACKAGING_TYPES)
+  foreach(packaging_type_ IN LISTS PACKAGING_TYPES)
+    run_cpack_test_common_("${TEST_NAME}" "${types}" "${build}" "" false "${packaging_type_}" true)
   endforeach()
 endfunction()
 
 function(run_cpack_test_subtests TEST_NAME SUBTEST_SUFFIXES types build PACKAGING_TYPES)
   foreach(suffix_ IN LISTS SUBTEST_SUFFIXES)
     foreach(packaging_type_ IN LISTS PACKAGING_TYPES)
-      run_cpack_test_common_("${TEST_NAME}" "${types}" "${build}" "${suffix_}" false "${packaging_type_}")
+      run_cpack_test_common_("${TEST_NAME}" "${types}" "${build}" "${suffix_}" false "${packaging_type_}" false)
     endforeach()
   endforeach()
 endfunction()
 
 function(run_cpack_source_test TEST_NAME types)
-  run_cpack_test_common_("${TEST_NAME}" "${types}" false "" true "")
+  run_cpack_test_common_("${TEST_NAME}" "${types}" false "" true "" false)
 endfunction()

@@ -33,8 +33,14 @@ if (Qt5Widgets_FOUND)
       PROPERTY COMPILE_DEFINITIONS USE_QXcbIntegrationPlugin)
   endif()
 
+  if(CMake_QT_STATIC_QWindowsIntegrationPlugin_LIBRARIES)
+    list(APPEND CMake_QT_LIBRARIES ${CMake_QT_STATIC_QWindowsIntegrationPlugin_LIBRARIES})
+    set_property(SOURCE CMakeSetup.cxx
+      PROPERTY COMPILE_DEFINITIONS USE_QWindowsIntegrationPlugin)
+  endif()
+
   # We need to install platform plugin and add qt.conf for Qt5 on Mac and Windows.
-  # FIXME: This should be part of Qt5 CMake scripts, but unfortunatelly
+  # FIXME: This should be part of Qt5 CMake scripts, but unfortunately
   # Qt5 support is missing there.
   if(CMake_INSTALL_DEPENDENCIES AND (APPLE OR WIN32))
     macro(install_qt5_plugin _qt_plugin_name _qt_plugins_var)
@@ -65,7 +71,7 @@ if (Qt5Widgets_FOUND)
       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/Resources"
         ${COMPONENT})
-    elseif(WIN32)
+    elseif(WIN32 AND NOT CMake_QT_STATIC_QWindowsIntegrationPlugin_LIBRARIES)
       install_qt5_plugin("Qt5::QWindowsIntegrationPlugin" QT_PLUGINS)
       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/qt.conf"
         "[Paths]\nPlugins = ../${_qt_plugin_dir}\n")
@@ -159,6 +165,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(cmake-gui WIN32 MACOSX_BUNDLE ${SRCS} ${MANIFEST_FILE})
 target_link_libraries(cmake-gui CMakeLib ${QT_QTMAIN_LIBRARY} ${CMake_QT_LIBRARIES})
+
+if(WIN32)
+  target_sources(cmake-gui PRIVATE $<TARGET_OBJECTS:CMakeVersion>)
+endif()
 
 # cmake-gui has not been updated for `include-what-you-use`.
 # Block the tool until this is done.

@@ -36,6 +36,7 @@ public:
   cmTargetInternalPointer& operator=(cmTargetInternalPointer const& r);
   cmTargetInternals* operator->() const { return this->Pointer; }
   cmTargetInternals* Get() const { return this->Pointer; }
+
 private:
   cmTargetInternals* Pointer;
 };
@@ -137,7 +138,7 @@ public:
   /**
    * Clear the dependency information recorded for this target, if any.
    */
-  void ClearDependencyInformation(cmMakefile& mf, const std::string& target);
+  void ClearDependencyInformation(cmMakefile& mf);
 
   void AddLinkLibrary(cmMakefile& mf, const std::string& lib,
                       cmTargetLinkLibraryType llt);
@@ -180,6 +181,12 @@ public:
   bool GetHaveInstallRule() const { return this->HaveInstallRule; }
   void SetHaveInstallRule(bool h) { this->HaveInstallRule = h; }
 
+  /**
+   * Get/Set whether this target was auto-created by a generator.
+   */
+  bool GetIsGeneratorProvided() const { return this->IsGeneratorProvided; }
+  void SetIsGeneratorProvided(bool igp) { this->IsGeneratorProvided = igp; }
+
   /** Add a utility on which this project depends. A utility is an executable
    * name as would be specified to the ADD_EXECUTABLE or UTILITY_SOURCE
    * commands. It is not a full path nor does it have an extension.
@@ -193,7 +200,10 @@ public:
   void SetProperty(const std::string& prop, const char* value);
   void AppendProperty(const std::string& prop, const char* value,
                       bool asString = false);
+  ///! Might return a nullptr if the property is not set or invalid
   const char* GetProperty(const std::string& prop) const;
+  ///! Always returns a valid pointer
+  const char* GetSafeProperty(const std::string& prop) const;
   bool GetPropertyAsBool(const std::string& prop) const;
   void CheckProperty(const std::string& prop, cmMakefile* context) const;
   const char* GetComputedProperty(const std::string& prop,
@@ -232,6 +242,8 @@ public:
                            cmListFileBacktrace const& bt, bool before = false);
   void InsertCompileDefinition(std::string const& entry,
                                cmListFileBacktrace const& bt);
+  void InsertLinkOption(std::string const& entry,
+                        cmListFileBacktrace const& bt, bool before = false);
 
   void AppendBuildInterfaceIncludes();
 
@@ -258,6 +270,10 @@ public:
 
   cmStringRange GetSourceEntries() const;
   cmBacktraceRange GetSourceBacktraces() const;
+
+  cmStringRange GetLinkOptionsEntries() const;
+  cmBacktraceRange GetLinkOptionsBacktraces() const;
+
   cmStringRange GetLinkImplementationEntries() const;
   cmBacktraceRange GetLinkImplementationBacktraces() const;
 
@@ -284,6 +300,7 @@ private:
                             std::string const& value) const;
 
 private:
+  bool IsGeneratorProvided;
   cmPropertyMap Properties;
   std::set<std::string> SystemIncludeDirectories;
   std::set<std::string> LinkDirectoriesEmmitted;
@@ -303,7 +320,6 @@ private:
   cmTargetInternalPointer Internal;
   cmStateEnums::TargetType TargetTypeValue;
   bool HaveInstallRule;
-  bool RecordDependencies;
   bool DLLPlatform;
   bool IsAndroid;
   bool IsImportedTarget;

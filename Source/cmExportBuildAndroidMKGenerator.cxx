@@ -7,7 +7,9 @@
 #include <sstream>
 #include <utility>
 
+#include "cmAlgorithms.h"
 #include "cmGeneratorExpression.h"
+#include "cmGeneratorExpressionDAGChecker.h"
 #include "cmGeneratorTarget.h"
 #include "cmLinkItem.h"
 #include "cmLocalGenerator.h"
@@ -40,7 +42,8 @@ void cmExportBuildAndroidMKGenerator::GenerateExpectedTargetsCode(
 }
 
 void cmExportBuildAndroidMKGenerator::GenerateImportTargetCode(
-  std::ostream& os, const cmGeneratorTarget* target)
+  std::ostream& os, cmGeneratorTarget const* target,
+  cmStateEnums::TargetType /*targetType*/)
 {
   std::string targetName = this->Namespace;
   targetName += target->GetExportName();
@@ -48,8 +51,7 @@ void cmExportBuildAndroidMKGenerator::GenerateImportTargetCode(
   os << "LOCAL_MODULE := ";
   os << targetName << "\n";
   os << "LOCAL_SRC_FILES := ";
-  std::string path =
-    cmSystemTools::ConvertToOutputPath(target->GetFullPath().c_str());
+  std::string path = cmSystemTools::ConvertToOutputPath(target->GetFullPath());
   os << path << "\n";
 }
 
@@ -102,12 +104,21 @@ void cmExportBuildAndroidMKGenerator::GenerateInterfaceProperties(
         os << "LOCAL_CPP_FEATURES += ";
         os << (property.second) << "\n";
       } else if (property.first == "INTERFACE_LINK_LIBRARIES") {
+        // evaluate any generator expressions with the current
+        // build type of the makefile
+        cmGeneratorExpression ge;
+        cmGeneratorExpressionDAGChecker dagChecker(
+          target->GetName(), "INTERFACE_LINK_LIBRARIES", nullptr, nullptr);
+        std::unique_ptr<cmCompiledGeneratorExpression> cge =
+          ge.Parse(property.second);
+        std::string evaluated = cge->Evaluate(
+          target->GetLocalGenerator(), config, false, target, &dagChecker);
         // need to look at list in pi->second and see if static or shared
         // FindTargetToLink
         // target->GetLocalGenerator()->FindGeneratorTargetToUse()
         // then add to LOCAL_CPPFLAGS
         std::vector<std::string> libraries;
-        cmSystemTools::ExpandListArgument(property.second, libraries);
+        cmSystemTools::ExpandListArgument(evaluated, libraries);
         std::string staticLibs;
         std::string sharedLibs;
         std::string ldlibs;
@@ -123,12 +134,6 @@ void cmExportBuildAndroidMKGenerator::GenerateInterfaceProperties(
               staticLibs += " " + lib;
             }
           } else {
-            // evaluate any generator expressions with the current
-            // build type of the makefile
-            cmGeneratorExpression ge;
-            std::unique_ptr<cmCompiledGeneratorExpression> cge = ge.Parse(lib);
-            std::string evaluated =
-              cge->Evaluate(target->GetLocalGenerator(), config);
             bool relpath = false;
             if (type == cmExportBuildAndroidMKGenerator::INSTALL) {
               relpath = lib.substr(0, 3) == "../";
@@ -136,12 +141,12 @@ void cmExportBuildAndroidMKGenerator::GenerateInterfaceProperties(
             // check for full path or if it already has a -l, or
             // in the case of an install check for relative paths
             // if it is full or a link library then use string directly
-            if (cmSystemTools::FileIsFullPath(evaluated) ||
-                evaluated.substr(0, 2) == "-l" || relpath) {
-              ldlibs += " " + evaluated;
+            if (cmSystemTools::FileIsFullPath(lib) ||
+                lib.substr(0, 2) == "-l" || relpath) {
+              ldlibs += " " + lib;
               // if it is not a path and does not have a -l then add -l
-            } else if (!evaluated.empty()) {
-              ldlibs += " -l" + evaluated;
+            } else if (!lib.empty()) {
+              ldlibs += " -l" + lib;
             }
           }
         }
@@ -165,6 +170,11 @@ void cmExportBuildAndroidMKGenerator::GenerateInterfaceProperties(
           end = "\\\n";
         }
         os << "\n";
+      } else if (property.first == "INTERFACE_LINK_OPTIONS") {
+        os << "LOCAL_EXPORT_LDFLAGS := ";
+        std::vector<std::string> linkFlagsList;
+        cmSystemTools::ExpandListArgument(property.second, linkFlagsList);
+        os << cmJoin(linkFlagsList, " ") << "\n";
       } else {
         os << "# " << property.first << " " << (property.second) << "\n";
       }

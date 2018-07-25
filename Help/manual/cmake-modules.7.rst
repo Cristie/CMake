@@ -54,21 +54,10 @@ All Modules
    /module/CMakePrintSystemInformation
    /module/CMakePushCheckState
    /module/CMakeVerifyManifest
-   /module/CPackArchive
-   /module/CPackBundle
    /module/CPackComponent
-   /module/CPackCygwin
-   /module/CPackDeb
-   /module/CPackDMG
-   /module/CPackFreeBSD
    /module/CPackIFW
    /module/CPackIFWConfigureFile
-   /module/CPackNSIS
-   /module/CPackPackageMaker
-   /module/CPackProductBuild
-   /module/CPackRPM
    /module/CPack
-   /module/CPackWIX
    /module/CSharpUtilities
    /module/CTest
    /module/CTestCoverageCollectGCOV
@@ -80,6 +69,7 @@ All Modules
    /module/ExternalData
    /module/ExternalProject
    /module/FeatureSummary
+   /module/FetchContent
    /module/FindALSA
    /module/FindArmadillo
    /module/FindASPELL
@@ -129,6 +119,7 @@ All Modules
    /module/FindIcotool
    /module/FindICU
    /module/FindImageMagick
+   /module/FindIconv
    /module/FindIntl
    /module/FindITK
    /module/FindJasper
@@ -153,6 +144,7 @@ All Modules
    /module/FindMPEG2
    /module/FindMPEG
    /module/FindMPI
+   /module/FindODBC
    /module/FindOpenACC
    /module/FindOpenAL
    /module/FindOpenCL
@@ -194,6 +186,9 @@ All Modules
    /module/FindPostgreSQL
    /module/FindProducer
    /module/FindProtobuf
+   /module/FindPython
+   /module/FindPython2
+   /module/FindPython3
    /module/FindPythonInterp
    /module/FindPythonLibs
    /module/FindQt3
@@ -256,3 +251,26 @@ All Modules
    /module/Use_wxWindows
    /module/WriteBasicConfigVersionFile
    /module/WriteCompilerDetectionHeader
+
+Legacy CPack Modules
+====================
+
+These modules used to be mistakenly exposed to the user, and have been moved
+out of user visibility. They are for CPack internal use, and should never be
+used directly.
+
+.. toctree::
+   :maxdepth: 1
+
+   /module/CPackArchive
+   /module/CPackBundle
+   /module/CPackCygwin
+   /module/CPackDeb
+   /module/CPackDMG
+   /module/CPackFreeBSD
+   /module/CPackNSIS
+   /module/CPackNuGet
+   /module/CPackPackageMaker
+   /module/CPackProductBuild
+   /module/CPackRPM
+   /module/CPackWIX
